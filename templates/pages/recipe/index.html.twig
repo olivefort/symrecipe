@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SymRecipe - Mes recettes{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+    {% if not recipes.items is same as([]) %}  
+        <h1>Mes Recettes</h1>
+
+        <a href="{{ path('recipe.new') }}" class="btn btn-primary">Créer une recette</a>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-dismissible alert-success mt-4">
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+
+        <div class="count mt-4">
+            <p>Il y a {{ recipes.getTotalItemCount }} recettes au total</p>
+        </div>
+
+        <table class="table table-hover">
+            <thead>
+                <tr>                
+                <th scope="col">Nom</th>
+                <th scope="col">Temps</th>
+                <th scope="col">Nombre de Personnes</th>
+                <th scope="col">Difficultée</th>
+                <th scope="col">Description</th>
+                <th scope="col">Prix</th>
+                <th scope="col">Favorie</th>
+                <th scope="col">Date de création</th>
+                <th scope="col">Dernière modification</th>
+                <th scope="col">Liste des ingrédients</th>
+                <th scope="col">Edition</th>
+                <th scope="col">Suppression</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for recipe in recipes %}                
+                    <tr class="table-primary">                    
+                        <td>{{recipe.name}}</td>
+                        <td>{{recipe.time|date('H:i:s')}}</td>
+                        <td>{{recipe.nbPeople}}{{ (recipe.nbPeople is same as (null)) ? 'Non renseigné' : ''}}</td>
+                        <td>{{recipe.difficulty}}{{(recipe.difficulty is same as (null)) ? 'Non renseigné':'/5'}}</td>
+                        <td>{{recipe.description}}</td>
+                        <td>{{recipe.price}}{{ (recipe.price is same as (null)) ? 'Non renseigné' : ''}}</td>
+                        <td>{{ (recipe.isFavorite is same as (true)) ? 'oui' : 'non'}}</td>
+                        <td>{{recipe.createdAt|date('d/m/Y')}}</td>
+                        <td>To Do</td>
+                        <td>To Do</td>
+                        <td><a type="button" class="btn btn-info" href="{{ path('recipe.edit', { id: recipe.id }) }}">Modifier</a></td>
+                        <td><a type="button" class="btn btn-danger" href="{{ path('recipe.delete', { id: recipe.id }) }}">Effacer</a></td>
+                    </tr>                
+                {% endfor %}             
+            </tbody>
+        </table>
+        <div class="navigation d-flex justify-content-center mt-4">{{ knp_pagination_render(recipes)}}</div>        
+        {% else %}
+            <h2>Il n'y a aucune recette</2>
+        {% endif %}
+    </div>
+
+
+{% endblock %}
