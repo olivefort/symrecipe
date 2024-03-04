@@ -56,6 +56,7 @@ class IngredientController extends AbstractController
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $ingredient = $form->getData();
+            //affiche les ingrédients lié à l'utilisateur
             $ingredient->setUser($this->getUser());
             
             $manager->persist($ingredient);
