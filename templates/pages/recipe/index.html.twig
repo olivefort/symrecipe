@@ -29,6 +29,7 @@
                 <th scope="col">Description</th>
                 <th scope="col">Prix</th>
                 <th scope="col">Favorie</th>
+                <th scope="col">Publique</th>
                 <th scope="col">Date de création</th>
                 <th scope="col">Dernière modification</th>
                 <th scope="col">Liste des ingrédients</th>
@@ -46,6 +47,7 @@
                         <td>{{recipe.description}}</td>
                         <td>{{recipe.price}}{{ (recipe.price is same as (null)) ? 'Non renseigné' : ''}}</td>
                         <td>{{ (recipe.isFavorite is same as (true)) ? 'oui' : 'non'}}</td>
+                        <td>{{ (recipe.isPublic is same as (true)) ? 'oui' : 'non'}}</td>
                         <td>{{recipe.createdAt|date('d/m/Y')}}</td>
                         <td>To Do</td>
                         <td>To Do</td>

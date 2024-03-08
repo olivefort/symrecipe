@@ -27,9 +27,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(min: 2, max: 50)]
     private string $fullName;
 
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[ORM\Column(type: 'string', length: 50)]
+    #[Assert\NotBlank()]
     #[Assert\Length(min: 2, max: 50)]
-    private ?string $pseudo = null;
+    private string $pseudo;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     #[Assert\Email()]
@@ -62,12 +63,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Recipe::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $recipes;
 
+    #[ORM\OneToMany(targetEntity: Mark::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $marks;
+
 
     public function __construct(){
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
         $this->ingredients = new ArrayCollection();
         $this->recipes = new ArrayCollection();
+        $this->marks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -92,7 +97,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->pseudo;
     }
 
-    public function setPseudo(?string $pseudo): static
+    public function setPseudo(string $pseudo): static
     {
         $this->pseudo = $pseudo;
 
@@ -251,6 +256,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($recipe->getUser() === $this) {
                 $recipe->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Mark>
+     */
+    public function getMarks(): Collection
+    {
+        return $this->marks;
+    }
+
+    public function addMark(Mark $mark): static
+    {
+        if (!$this->marks->contains($mark)) {
+            $this->marks->add($mark);
+            $mark->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMark(Mark $mark): static
+    {
+        if ($this->marks->removeElement($mark)) {
+            // set the owning side to null (unless already changed)
+            if ($mark->getUser() === $this) {
+                $mark->setUser(null);
             }
         }
 

@@ -1,27 +1,23 @@
-{% extends "base.html.twig" %}
+{% extends 'base.html.twig' %}
 
-{% block title %}
-    Symrecipe - Accueil
-{% endblock %}
+{% block title %}SymRecipe - Mes recettes{% endblock %}
 
 {% block body %}
     <div class="container mt-4">
-        <div class="jumbotron">
-            <h1 class="display-4">Bienvenu sur Symrecipe</h1>
-            <p class="lead">Ici tu trouveras des super recettes de cuisine pour le plaisir des ventres de tout le monde !</p>
-            <hr class="my-4">
-            <p>Pour commencer, rendez-vous sur la page d'inscription pour utiliser l'application</p>
-            {% if not app.user %}
-                <a class="btn btn-primary btn-lg" href="{{ path('security.registration')}}" role="button">Inscription</a>
-                <a class="btn btn-primary btn-lg" href="{{ path('security.login')}}" role="button">Se connecter</a>
-            {% endif %}            
+    {% if not recipes.items is same as([]) %}  
+        <h1>Les Recettes Publiques</h1>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-dismissible alert-success mt-4">
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+
+        <div class="count mt-4">
+            <p>Il y a {{ recipes.getTotalItemCount }} recettes publiques au total</p>
         </div>
-    </div>
-
-
-    <div class="container mt-4">
-        <h3 class="mt-4">Les dernières recette de la communauté</h3>
-        <div class="row">
+        <div class="container">
+            <div class="row">
             {% for recipe in recipes %}            
                 <div class="card text-white bg-primary mb-3 mx-2 col-4" style="max-width: 20rem;">
                     <div class="card-header">Recette n°{{recipe.id}}</div>
@@ -36,5 +32,16 @@
                 </div>            
             {% endfor %}
             </div>
+        </div>
+
+        
+
+
+        <div class="navigation d-flex justify-content-center mt-4">{{ knp_pagination_render(recipes)}}</div>        
+        {% else %}
+            <h2>Il n'y a aucune recette</2>
+        {% endif %}
     </div>
+
+
 {% endblock %}

@@ -10,10 +10,14 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 
 class IngredientController extends AbstractController
 {
+
     /**
      * This controller display all ingredients
      *
@@ -23,6 +27,7 @@ class IngredientController extends AbstractController
      * @return Response
      */
     #[Route('/ingredient', name: 'ingredient.index', methods:['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function index(
         IngredientRepository $repository, 
         PaginatorInterface $paginator, 
@@ -44,8 +49,9 @@ class IngredientController extends AbstractController
         ]);
     }
 
-
+    
     #[Route('/ingredient/nouveau', name: 'ingredient.new', methods:['GET','POST'])]
+    #[IsGranted('ROLE_USER')]
     public function new(
         Request $request, 
         EntityManagerInterface $manager
@@ -83,6 +89,10 @@ class IngredientController extends AbstractController
      * @param Request $request
      * @return Response
      */
+    #[IsGranted(
+        new Expression("is_granted('ROLE_USER') and user === subject.getUser()"),
+        subject:'ingredient',
+    )]
     #[Route('/ingredient/edition/{id}', 'ingredient.edit', methods: ['GET','POST'])]
     public function edit(
         Request $request,
@@ -93,7 +103,11 @@ class IngredientController extends AbstractController
         $form = $this->createForm(IngredientType::class,$ingredient);
 
         $form->handleRequest($request);
-        if($form->isSubmitted() && $form->isValid()){
+        //Autre façon de #[IsGranted()] avec une condition de bloquer l'accès aux ingrédient qui n'appartienne pas à l'utilisateur
+        // if ($ingredient->getUser() !== $this->getUser()) {
+        //     throw $this->createAccessDeniedException();        
+        // }else{
+            if($form->isSubmitted() && $form->isValid()){
             $ingredient = $form->getData();
             
             $manager->persist($ingredient);
@@ -106,6 +120,8 @@ class IngredientController extends AbstractController
 
             return $this->redirectToRoute('ingredient.index');
         }
+    // }
+        
 
         return $this->render('pages/ingredient/edit.html.twig', [
             'form' => $form->createView()
@@ -120,13 +136,20 @@ class IngredientController extends AbstractController
      * @return Response
      */
     #[Route('ingredient/suppression/{id}', 'ingredient.delete', methods: ['GET'])]
+    #[IsGranted(
+        new Expression("is_granted('ROLE_USER') and user === subject.getUser()"),
+        subject:'ingredient',
+    )]
     public function delete(
         EntityManagerInterface $manager,
         Ingredient $ingredient
     ):Response{
-        $manager->remove($ingredient);
-        $manager->flush();
-
+        if ($ingredient->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();        
+        }else{
+            $manager->remove($ingredient);
+            $manager->flush();
+        }
         $this->addFlash(
             'success',
             'Votre ingrédient a été supprimé avec succès !'

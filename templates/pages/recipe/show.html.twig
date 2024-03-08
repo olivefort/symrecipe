@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SymRecipe - {{recipe.name}}{% endblock %}
+
+{% block body %}
+ <div class="container">
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success mt-4">
+            <strong>{{ message }}</strong>
+        </div>
+    {% endfor %}
+
+    <h1 class="mt-4">
+        {{recipe.name}}
+    </h1>
+
+    <p class="mt-4">La moyenne de cette recette est de {{ recipe.average|slice(0, 4) }} /5</p>
+    <p class="mt-4">Recette publique : {{(recipe.isPublic is same as (true)) ? 'Oui' : 'Non' }}</p>
+    {% if app.user %}
+        <p class="mt-4">Temps de préparation : {{(recipe.time is same as (null)) ? 'Non renseigné' : recipe.time|date('H:i:s') }}</p>
+        <p class="mt-4">Nombre de personnes : {{recipe.nbPeople}}{{(recipe.nbPeople is same as (null)) ? 'Non renseigné' : '' }}</p>
+        <p class="mt-4">Description : {{recipe.description}}</p>
+        <p class="mt-4">Difficulté : {{recipe.difficulty}}{{(recipe.difficulty is same as (null)) ? 'Non renseigné' : '/5' }}</p>
+        <p class="mt-4">Prix : {{recipe.price}}{{(recipe.price is same as (null)) ? 'Non renseigné' : '' }}</p>
+        <p class="mt-4">Recette Favorie : {{(recipe.isFavorite is same as (true)) ? 'Oui' : 'Non' }}</p>
+        <p class="mt-4">Recette créé le : {{recipe.createdAt|date('d/m/Y')}}</p>
+        <p class="mt-4">Ingrédient</p>
+        {% for ingredient in recipe.ingredients %}
+            <span class="badge bg-primary">{{ ingredient.name}}</span>
+        {% endfor %}
+    {% else %}
+        <p>Cette recette n'est pas publique</p>
+    {% endif %}
+    <div>{{ form(form) }}</div>
+</div>
+
+
+{% endblock %}
